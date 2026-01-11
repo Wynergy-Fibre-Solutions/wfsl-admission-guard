@@ -1,4 +1,2 @@
-export { WFSL_ADMISSION_SCHEMA_V1 } from "./schema.v1.js";
-export type * from "./types.js";
-export { parseManifestJson, decideAdmission } from "./engine.js";
-//# sourceMappingURL=index.d.ts.map
+export { runAdmission } from "./engine.js";
+export type { AdmissionResult } from "./engine.js";

@@ -134,4 +134,3 @@ export declare const WFSL_ADMISSION_SCHEMA_V1: {
         };
     };
 };
-//# sourceMappingURL=schema.v1.d.ts.map

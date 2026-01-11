@@ -1,155 +1,75 @@
-import Ajv from "ajv";
-import { WFSL_ADMISSION_SCHEMA_V1 } from "./schema.v1.js";
-import type {
-  WFSLAdmissionManifestV1,
-  WFSLDecisionInput,
-  WFSLDecisionResult,
-  WFSLDecisionEvidence,
-  WFSLSurface,
-  WFSLDecisionCode
-} from "./types.js";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { resolve } from "node:path";
+import AjvPkg from "ajv";
 
-const ajv = new Ajv({ allErrors: true, strict: true });
-const validateManifest = ajv.compile(WFSL_ADMISSION_SCHEMA_V1);
+const Ajv = AjvPkg as unknown as typeof AjvPkg;
 
-function nowIso(now: Date): string {
-  return now.toISOString();
+export interface AdmissionResult {
+  admitted: boolean;
+  reasons: string[];
+  evidencePath: string;
 }
 
-function normalisePath(p: string): string {
-  if (!p) return "/";
-  return p.startsWith("/") ? p : `/${p}`;
-}
+export function runAdmission(root: string): AdmissionResult {
+  const reasons: string[] = [];
+  const resolvedRoot = resolve(root);
 
-function methodUpper(m?: string): string | undefined {
-  if (!m) return undefined;
-  return m.toUpperCase();
-}
-
-function isExpired(surface: WFSLSurface, now: Date): boolean {
-  if (!surface.expires_at) return false;
-  const t = Date.parse(surface.expires_at);
-  if (Number.isNaN(t)) return false;
-  return t < now.getTime();
-}
-
-function buildEvidence(
-  manifest: Partial<WFSLAdmissionManifestV1> | undefined,
-  input: WFSLDecisionInput,
-  outcome: "ADMITTED" | "REFUSED" | "ERROR",
-  code: WFSLDecisionCode,
-  status: number,
-  now: Date
-): WFSLDecisionEvidence {
-  return {
-    schema: "wfsl.admission.v1",
-    manifest_version: manifest?.manifest_version,
-    manifest_id: manifest?.integrity?.manifest_id,
-    issuer: manifest?.integrity?.issuer,
-    route: normalisePath(input.pathname),
-    method: methodUpper(input.method),
-    outcome,
-    code,
-    status,
-    posture: "deny",
-    timestamp: nowIso(now)
-  };
-}
-
-export function parseManifestJson(jsonText: string): WFSLAdmissionManifestV1 | null {
-  try {
-    return JSON.parse(jsonText) as WFSLAdmissionManifestV1;
-  } catch {
-    return null;
-  }
-}
-
-export function decideAdmission(
-  manifest: unknown,
-  input: WFSLDecisionInput
-): WFSLDecisionResult {
-  const now = input.now ?? new Date();
-  const pathname = normalisePath(input.pathname);
-  const method = methodUpper(input.method) ?? "GET";
-
-  const ok = validateManifest(manifest);
-  if (!ok) {
-    const evidence = buildEvidence(
-      undefined,
-      { pathname, method, now },
-      "ERROR",
-      "ADMISSION_MANIFEST_INVALID",
-      500,
-      now
-    );
-
-    return {
-      ok: false,
-      outcome: "ERROR",
-      status: 500,
-      evidence,
-      errors: validateManifest.errors
-    };
-  }
-
-  const typed = manifest as WFSLAdmissionManifestV1;
-  const surfaces = typed.surfaces ?? [];
-
-  const surface = surfaces.find((s) => normalisePath(s.path) === pathname);
-
-  if (!surface) {
-    const status = typed.defaults?.refusal_status ?? 451;
-    const evidence = buildEvidence(
-      typed,
-      { pathname, method, now },
-      "REFUSED",
-      "SURFACE_NOT_ADMITTED",
-      status,
-      now
-    );
-
-    return { ok: true, outcome: "REFUSED", status, evidence };
-  }
-
-  if (isExpired(surface, now)) {
-    const status = typed.defaults?.refusal_status ?? 451;
-    const evidence = buildEvidence(
-      typed,
-      { pathname, method, now },
-      "REFUSED",
-      "SURFACE_EXPIRED",
-      status,
-      now
-    );
-
-    return { ok: true, outcome: "REFUSED", status, evidence };
-  }
-
-  if (surface.kind === "api") {
-    const methods = (surface.methods ?? ["GET"]).map((m) => m.toUpperCase());
-    if (!methods.includes(method)) {
-      const status = typed.defaults?.refusal_status ?? 451;
-      const evidence = buildEvidence(
-        typed,
-        { pathname, method, now },
-        "REFUSED",
-        "METHOD_NOT_ADMITTED",
-        status,
-        now
-      );
-
-      return { ok: true, outcome: "REFUSED", status, evidence };
+  // Required files
+  const requiredFiles = [".gitignore", "README.md", "LICENSE"];
+  for (const file of requiredFiles) {
+    try {
+      readFileSync(resolve(resolvedRoot, file));
+    } catch {
+      reasons.push(`REQUIRED_FILE_MISSING: ${file}`);
     }
   }
 
-  const evidence = buildEvidence(
-    typed,
-    { pathname, method, now },
-    "ADMITTED",
-    "ADMITTED",
-    200,
-    now
+  // Optional policy validation
+  try {
+    const policyPath = resolve(resolvedRoot, "wfsl.admission.json");
+    const raw = readFileSync(policyPath, "utf-8");
+    const policy = JSON.parse(raw);
+
+    const ajv = new (Ajv as any)({ allErrors: true, strict: true });
+    const validate = ajv.compile({
+      type: "object",
+      required: ["version"],
+      properties: {
+        version: { type: "string" }
+      },
+      additionalProperties: true
+    });
+
+    if (!validate(policy)) {
+      reasons.push("POLICY_INVALID");
+    }
+  } catch {
+    // policy optional
+  }
+
+  const admitted = reasons.length === 0;
+
+  // Evidence emission
+  const evidenceDir = resolve(resolvedRoot, "evidence");
+  mkdirSync(evidenceDir, { recursive: true });
+
+  const evidencePath = resolve(
+    evidenceDir,
+    `admission-${new Date().toISOString().replace(/[:.]/g, "-")}.json`
   );
 
-  return { ok: true, outcome: "ADMITTED", status: 200, evidence, surface };
+  writeFileSync(
+    evidencePath,
+    JSON.stringify(
+      {
+        admitted,
+        reasons,
+        timestamp: new Date().toISOString()
+      },
+      null,
+      2
+    )
+  );
+
+  return { admitted, reasons, evidencePath };
 }

@@ -68,4 +68,3 @@ export const WFSL_ADMISSION_SCHEMA_V1 = {
         }
     }
 };
-//# sourceMappingURL=schema.v1.js.map

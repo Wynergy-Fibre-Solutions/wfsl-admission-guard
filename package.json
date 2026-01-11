@@ -25,8 +25,18 @@
     "fast-glob": "^3.3.2"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/node": "^22.19.5",
     "@vercel/ncc": "^0.38.3",
     "typescript": "^5.9.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WFSL/wfsl-admission-guard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/WFSL/wfsl-admission-guard/issues"
+  },
+  "homepage": "https://github.com/WFSL/wfsl-admission-guard#readme"
 }
