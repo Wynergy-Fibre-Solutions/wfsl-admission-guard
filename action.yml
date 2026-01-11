@@ -1,34 +1,17 @@
-name: WFSL Admission Guard
-description: Deny-by-default admission enforcement. Scans Next.js App Router routes and blocks CI if any discovered surface is not explicitly admitted.
-author: WFSL
+name: "WFSL Admission Guard"
+description: "Deterministic, deny-by-default admission enforcement with audit-grade evidence."
+author: "Wynergy Fibre Solutions Ltd"
+
 branding:
-  icon: shield
-  color: blue
+  icon: "shield"
+  color: "blue"
 
 inputs:
-  root:
-    description: Project root to scan (Next.js app directory lives under app/ or src/app/).
-    required: false
-    default: "."
-  manifest:
-    description: Path to wfsl admission manifest JSON.
-    required: false
-    default: "wfsl.admission.json"
   mode:
-    description: Enforcement mode. v1 supports only "strict".
+    description: "Admission mode (repo | marketplace)"
     required: false
-    default: "strict"
-  fail_on_dynamic:
-    description: Fail if dynamic segments like [id] are detected.
-    required: false
-    default: "true"
-
-outputs:
-  admitted:
-    description: Number of admitted discovered routes.
-  refused:
-    description: Number of refused discovered routes.
+    default: "repo"
 
 runs:
-  using: node20
-  main: dist-action/index.cjs
+  using: "node20"
+  main: "dist-action/index.cjs"
