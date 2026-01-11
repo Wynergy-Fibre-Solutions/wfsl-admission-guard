@@ -1,0 +1,32 @@
+{
+  "name": "wfsl-admission-guard",
+  "version": "0.1.1",
+  "description": "WFSL Admission Guard core engine and GitHub Action adapter (schema-validated, deny-by-default admission decisions).",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "dist-action",
+    "action.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "node -e \"try{require('node:fs').rmSync('dist',{recursive:true,force:true})}catch(e){};try{require('node:fs').rmSync('dist-action',{recursive:true,force:true})}catch(e){}\"",
+    "build": "tsc -p tsconfig.json",
+    "build:action": "ncc build action-src/index.cjs -o dist-action && node -e \"const fs=require('node:fs');const p='dist-action/index.js';if(fs.existsSync(p)){fs.renameSync(p,'dist-action/index.cjs')}\"",
+    "build:all": "npm run build && npm run build:action"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "ajv": "^8.17.1",
+    "fast-glob": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vercel/ncc": "^0.38.3",
+    "typescript": "^5.9.3"
+  }
+}

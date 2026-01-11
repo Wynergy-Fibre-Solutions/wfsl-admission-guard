@@ -1,0 +1,25 @@
+{
+  "schema": "wfsl.admission.v1",
+  "manifest_version": "1.0.0",
+  "posture": "deny",
+  "defaults": {
+    "refusal_status": 451,
+    "refusal_code": "SURFACE_NOT_ADMITTED",
+    "evidence": "summary"
+  },
+  "integrity": {
+    "manifest_id": "wfsl-admission-guard-repo",
+    "issuer": "WFSL",
+    "created_at": "2026-01-11T00:00:00Z"
+  },
+  "surfaces": [
+    {
+      "path": "/",
+      "kind": "page",
+      "audience": "public",
+      "intent": "Repository-only placeholder surface to keep manifest valid for action tests.",
+      "indexing": "disallowed",
+      "tags": ["internal-test"]
+    }
+  ]
+}
