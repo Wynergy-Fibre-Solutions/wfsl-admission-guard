@@ -1,1 +1,0 @@
-{"version":3,"file":"engine.d.ts","sourceRoot":"","sources":["../src/engine.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EACV,uBAAuB,EACvB,iBAAiB,EACjB,kBAAkB,EAInB,MAAM,YAAY,CAAC;AAiDpB,wBAAgB,iBAAiB,CAAC,QAAQ,EAAE,MAAM,GAAG,uBAAuB,GAAG,IAAI,CAMlF;AAED,wBAAgB,eAAe,CAC7B,QAAQ,EAAE,OAAO,EACjB,KAAK,EAAE,iBAAiB,GACvB,kBAAkB,CAqFpB"}
