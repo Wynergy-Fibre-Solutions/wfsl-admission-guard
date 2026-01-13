@@ -1,0 +1,41 @@
+{
+  "licence": "WFSL Community Edition",
+  "version": "1.0",
+  "issuer": "Wynergy Fibre Solutions Ltd",
+  "repository": "wfsl-admission-guard",
+  "scope": {
+    "permitted": [
+      "source_code_access",
+      "local_execution",
+      "inspection",
+      "experimentation",
+      "non_production_use"
+    ],
+    "prohibited_without_commercial_licence": [
+      "production_reliance",
+      "audit_assertions",
+      "regulatory_use",
+      "commercial_deployment",
+      "service_delivery_claims"
+    ]
+  },
+  "verification": {
+    "verified_tags": "demonstrate observed behaviour only",
+    "evidence_artefacts": "do not grant permission to rely",
+    "re_execution_required_for_assurance": true
+  },
+  "reliance_boundary": {
+    "assumed_trust": false,
+    "platform_trust": "none",
+    "liability_transfer": false
+  },
+  "commercial": {
+    "commercial_reliance_licence_required": true,
+    "contact": "licensing@wfsl.uk"
+  },
+  "integrity": {
+    "immutability": "append_only",
+    "modification": "new_version_required",
+    "retroactive_change": false
+  }
+}
