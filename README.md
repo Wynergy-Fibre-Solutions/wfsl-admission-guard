@@ -4,7 +4,7 @@
 
 WFSL Admission Guard prevents applications from exposing routes or interfaces that have not been explicitly declared, admitted, and approved.
 
-It is designed for teams that prioritise correctness, governance, auditability, and deterministic behaviour over convenience.
+It is designed for teams that prioritise correctness, governance, and auditability over convenience.
 
 ---
 
@@ -16,9 +16,8 @@ WFSL Admission Guard:
 - Compares discovered surfaces against an explicit admission manifest
 - Fails CI if any route exists without admission
 - Produces deterministic, machine-verifiable outcomes
-- Operates without inference, heuristics, or guesswork
 
-If a route is not declared, it is treated as non-existent.
+Nothing is inferred. Nothing is guessed.
 
 ---
 
@@ -26,7 +25,7 @@ If a route is not declared, it is treated as non-existent.
 
 Most systems expose behaviour accidentally.
 
-Routes are added implicitly, refactors drift, and security posture degrades over time without detection.
+Routes are added implicitly, refactors drift, and security posture degrades without detection.
 
 WFSL Admission Guard enforces a single non-negotiable rule:
 
@@ -36,20 +35,18 @@ This reduces:
 
 - Accidental public exposure
 - Undeclared surface area
-- Long-term configuration drift
+- Long-term drift
 - Audit and compliance risk
-- Silent failures in CI and production
 
 ---
 
 ## How it works (high level)
 
-1. You define allowed public surfaces in `wfsl.admission.json`
-2. The guard scans your project for actual routes
+1. Allowed public surfaces are declared in `wfsl.admission.json`
+2. The guard scans the project for actual routes
 3. Any discovered route not present in the manifest causes failure
 4. Failures are explicit, attributable, and machine-readable
 
-No behaviour is inferred.  
 No routes are auto-approved.  
 No silent passes occur.
 
@@ -59,32 +56,62 @@ No silent passes occur.
 
 WFSL Admission Guard supports deterministic, non-destructive verification.
 
-A verification harness is provided to:
+Verification runs:
 
 - Declare execution context explicitly
-- Capture platform and runtime state
-- Emit evidence as structured JSON
-- Record failures as first-class data
+- Avoid reliance on platform introspection
+- Emit structured JSON evidence
+- Do not modify application or system state
 
-Verification runs do not modify the system under inspection.
-
-Generated artefacts include:
+Typical artefacts include:
 
 - `environment.json`
 - `execution-context.json`
 - `run-*.json`
 
-These artefacts enable independent review and audit without rerunning the tool.
+These artefacts demonstrate observed behaviour only.
 
 ---
 
-## Usage (GitHub Actions)
+## Intended use
 
-```yaml
-- name: WFSL Admission Guard
-  uses: wfsl/wfsl-admission-guard@v1
-  with:
-    root: .
-    manifest: wfsl.admission.json
-    mode: strict
-    fail_on_dynamic: "true"
+WFSL Admission Guard is suitable for:
+
+- CI pipelines
+- Governance enforcement
+- Security review
+- Regulated environments
+- Teams requiring explicit surface control
+
+It is intentionally opinionated.
+
+---
+
+## Licensing and reliance
+
+This repository is available under the **WFSL Community Edition**.
+
+Source code access, execution, and experimentation are permitted.
+
+**Production reliance, audit claims, or regulatory use are not permitted** without a Commercial Reliance Licence.
+
+Verification artefacts demonstrate observed behaviour only and do not grant permission to rely.
+
+See the canonical framework:
+
+- `WFSL-LICENSING-AND-RELIANCE.md`
+
+For commercial licensing enquiries:
+
+licensing@wfsl.uk
+
+---
+
+## Status
+
+- Verification: complete
+- Deterministic evidence: emitted
+- CI enforcement: deterministic
+- Reliance granted: none
+
+This repository reflects a verified, non-reliant community release.
