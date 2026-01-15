@@ -1,75 +1,55 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { resolve } from "node:path";
-import AjvPkg from "ajv";
+/**
+ * WFSL Admission Guard — Engine
+ *
+ * Deterministic, side-effect free admission evaluation.
+ * No signing. No I/O. No environment dependence.
+ */
 
-const Ajv = AjvPkg as unknown as typeof AjvPkg;
+export type AdmissionRequest = {
+  subject: string;
+  action: string;
+  resource: string;
+  context?: Record<string, unknown>;
+};
 
-export interface AdmissionResult {
-  admitted: boolean;
-  reasons: string[];
-  evidencePath: string;
-}
+export type AdmissionDecision = {
+  allowed: boolean;
+  reason: string;
+  policyVersion: string;
+};
 
-export function runAdmission(root: string): AdmissionResult {
-  const reasons: string[] = [];
-  const resolvedRoot = resolve(root);
+export type AdmissionPolicy = {
+  version: string;
+  rules: Array<{
+    subject: string;
+    action: string;
+    resource: string;
+    allow: boolean;
+  }>;
+};
 
-  // Required files
-  const requiredFiles = [".gitignore", "README.md", "LICENSE"];
-  for (const file of requiredFiles) {
-    try {
-      readFileSync(resolve(resolvedRoot, file));
-    } catch {
-      reasons.push(`REQUIRED_FILE_MISSING: ${file}`);
-    }
-  }
-
-  // Optional policy validation
-  try {
-    const policyPath = resolve(resolvedRoot, "wfsl.admission.json");
-    const raw = readFileSync(policyPath, "utf-8");
-    const policy = JSON.parse(raw);
-
-    const ajv = new (Ajv as any)({ allErrors: true, strict: true });
-    const validate = ajv.compile({
-      type: "object",
-      required: ["version"],
-      properties: {
-        version: { type: "string" }
-      },
-      additionalProperties: true
-    });
-
-    if (!validate(policy)) {
-      reasons.push("POLICY_INVALID");
-    }
-  } catch {
-    // policy optional
-  }
-
-  const admitted = reasons.length === 0;
-
-  // Evidence emission
-  const evidenceDir = resolve(resolvedRoot, "evidence");
-  mkdirSync(evidenceDir, { recursive: true });
-
-  const evidencePath = resolve(
-    evidenceDir,
-    `admission-${new Date().toISOString().replace(/[:.]/g, "-")}.json`
+export function evaluateAdmission(
+  request: AdmissionRequest,
+  policy: AdmissionPolicy
+): AdmissionDecision {
+  const match = policy.rules.find(
+    r =>
+      r.subject === request.subject &&
+      r.action === request.action &&
+      r.resource === request.resource
   );
 
-  writeFileSync(
-    evidencePath,
-    JSON.stringify(
-      {
-        admitted,
-        reasons,
-        timestamp: new Date().toISOString()
-      },
-      null,
-      2
-    )
-  );
+  if (!match) {
+    return {
+      allowed: false,
+      reason: 'no matching rule',
+      policyVersion: policy.version
+    };
+  }
 
-  return { admitted, reasons, evidencePath };
+  return {
+    allowed: match.allow,
+    reason: match.allow ? 'explicit allow' : 'explicit deny',
+    policyVersion: policy.version
+  };
 }
