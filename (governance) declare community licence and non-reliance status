@@ -1,0 +1,143 @@
+[33mcommit 56f8445f474590245047bee5b43b779f442d852e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;33mtag: [m[1;33mgovernance-aligned-v1[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Paul Wynn <wfsl@proton.me>
+Date:   Tue Jan 13 17:09:27 2026 +0000
+
+    docs(readme): full replacement with licensing and reliance boundary
+
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 4cbb2e1..e653f47 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -4,7 +4,7 @@[m
+ [m
+ WFSL Admission Guard prevents applications from exposing routes or interfaces that have not been explicitly declared, admitted, and approved.[m
+ [m
+[31m-It is designed for teams that prioritise correctness, governance, auditability, and deterministic behaviour over convenience.[m
+[32m+[m[32mIt is designed for teams that prioritise correctness, governance, and auditability over convenience.[m
+ [m
+ ---[m
+ [m
+[36m@@ -16,9 +16,8 @@[m [mWFSL Admission Guard:[m
+ - Compares discovered surfaces against an explicit admission manifest[m
+ - Fails CI if any route exists without admission[m
+ - Produces deterministic, machine-verifiable outcomes[m
+[31m-- Operates without inference, heuristics, or guesswork[m
+ [m
+[31m-If a route is not declared, it is treated as non-existent.[m
+[32m+[m[32mNothing is inferred. Nothing is guessed.[m
+ [m
+ ---[m
+ [m
+[36m@@ -26,7 +25,7 @@[m [mIf a route is not declared, it is treated as non-existent.[m
+ [m
+ Most systems expose behaviour accidentally.[m
+ [m
+[31m-Routes are added implicitly, refactors drift, and security posture degrades over time without detection.[m
+[32m+[m[32mRoutes are added implicitly, refactors drift, and security posture degrades without detection.[m
+ [m
+ WFSL Admission Guard enforces a single non-negotiable rule:[m
+ [m
+[36m@@ -36,20 +35,18 @@[m [mThis reduces:[m
+ [m
+ - Accidental public exposure[m
+ - Undeclared surface area[m
+[31m-- Long-term configuration drift[m
+[32m+[m[32m- Long-term drift[m
+ - Audit and compliance risk[m
+[31m-- Silent failures in CI and production[m
+ [m
+ ---[m
+ [m
+ ## How it works (high level)[m
+ [m
+[31m-1. You define allowed public surfaces in `wfsl.admission.json`[m
+[31m-2. The guard scans your project for actual routes[m
+[32m+[m[32m1. Allowed public surfaces are declared in `wfsl.admission.json`[m
+[32m+[m[32m2. The guard scans the project for actual routes[m
+ 3. Any discovered route not present in the manifest causes failure[m
+ 4. Failures are explicit, attributable, and machine-readable[m
+ [m
+[31m-No behaviour is inferred.  [m
+ No routes are auto-approved.  [m
+ No silent passes occur.[m
+ [m
+[36m@@ -59,32 +56,62 @@[m [mNo silent passes occur.[m
+ [m
+ WFSL Admission Guard supports deterministic, non-destructive verification.[m
+ [m
+[31m-A verification harness is provided to:[m
+[32m+[m[32mVerification runs:[m
+ [m
+ - Declare execution context explicitly[m
+[31m-- Capture platform and runtime state[m
+[31m-- Emit evidence as structured JSON[m
+[31m-- Record failures as first-class data[m
+[32m+[m[32m- Avoid reliance on platform introspection[m
+[32m+[m[32m- Emit structured JSON evidence[m
+[32m+[m[32m- Do not modify application or system state[m
+ [m
+[31m-Verification runs do not modify the system under inspection.[m
+[31m-[m
+[31m-Generated artefacts include:[m
+[32m+[m[32mTypical artefacts include:[m
+ [m
+ - `environment.json`[m
+ - `execution-context.json`[m
+ - `run-*.json`[m
+ [m
+[31m-These artefacts enable independent review and audit without rerunning the tool.[m
+[32m+[m[32mThese artefacts demonstrate observed behaviour only.[m
+[32m+[m
+[32m+[m[32m---[m
+[32m+[m
+[32m+[m[32m## Intended use[m
+[32m+[m
+[32m+[m[32mWFSL Admission Guard is suitable for:[m
+[32m+[m
+[32m+[m[32m- CI pipelines[m
+[32m+[m[32m- Governance enforcement[m
+[32m+[m[32m- Security review[m
+[32m+[m[32m- Regulated environments[m
+[32m+[m[32m- Teams requiring explicit surface control[m
+[32m+[m
+[32m+[m[32mIt is intentionally opinionated.[m
+ [m
+ ---[m
+ [m
+[31m-## Usage (GitHub Actions)[m
+[32m+[m[32m## Licensing and reliance[m
+[32m+[m
+[32m+[m[32mThis repository is available under the **WFSL Community Edition**.[m
+[32m+[m
+[32m+[m[32mSource code access, execution, and experimentation are permitted.[m
+[32m+[m
+[32m+[m[32m**Production reliance, audit claims, or regulatory use are not permitted** without a Commercial Reliance Licence.[m
+[32m+[m
+[32m+[m[32mVerification artefacts demonstrate observed behaviour only and do not grant permission to rely.[m
+[32m+[m
+[32m+[m[32mSee the canonical framework:[m
+[32m+[m
+[32m+[m[32m- `WFSL-LICENSING-AND-RELIANCE.md`[m
+[32m+[m
+[32m+[m[32mFor commercial licensing enquiries:[m
+[32m+[m
+[32m+[m[32mlicensing@wfsl.uk[m
+[32m+[m
+[32m+[m[32m---[m
+[32m+[m
+[32m+[m[32m## Status[m
+[32m+[m
+[32m+[m[32m- Verification: complete[m
+[32m+[m[32m- Deterministic evidence: emitted[m
+[32m+[m[32m- CI enforcement: deterministic[m
+[32m+[m[32m- Reliance granted: none[m
+ [m
+[31m-```yaml[m
+[31m-- name: WFSL Admission Guard[m
+[31m-  uses: wfsl/wfsl-admission-guard@v1[m
+[31m-  with:[m
+[31m-    root: .[m
+[31m-    manifest: wfsl.admission.json[m
+[31m-    mode: strict[m
+[31m-    fail_on_dynamic: "true"[m
+[32m+[m[32mThis repository reflects a verified, non-reliant community release.[m
