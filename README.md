@@ -1,117 +1,54 @@
 # WFSL Admission Guard
 
-**Deny-by-default admission enforcement for modern web systems.**
-
-WFSL Admission Guard prevents applications from exposing routes or interfaces that have not been explicitly declared, admitted, and approved.
-
-It is designed for teams that prioritise correctness, governance, and auditability over convenience.
+Status: Pattern-aligned guard library  
+Pattern: WFSL Guard Pattern v1  
+Trust Baseline: TRUST.md
 
 ---
 
-## What this does
+## Scope
 
-WFSL Admission Guard:
+WFSL Admission Guard is a guard **library** implementing admission-time enforcement according to the WFSL Guard Pattern.
 
-- Discovers routes in Next.js App Router projects
-- Compares discovered surfaces against an explicit admission manifest
-- Fails CI if any route exists without admission
-- Produces deterministic, machine-verifiable outcomes
-
-Nothing is inferred. Nothing is guessed.
+It is not currently distributed as a GitHub Action.
 
 ---
 
-## Why this exists
+## Guarantees
 
-Most systems expose behaviour accidentally.
+All guarantees are defined exclusively in `TRUST.md`.
 
-Routes are added implicitly, refactors drift, and security posture degrades without detection.
-
-WFSL Admission Guard enforces a single non-negotiable rule:
-
-> **If it is not explicitly admitted, it does not exist.**
-
-This reduces:
-
-- Accidental public exposure
-- Undeclared surface area
-- Long-term drift
-- Audit and compliance risk
+No security, trust, or enforcement claims exist outside that document.
 
 ---
 
-## How it works (high level)
+## Structure
 
-1. Allowed public surfaces are declared in `wfsl.admission.json`
-2. The guard scans the project for actual routes
-3. Any discovered route not present in the manifest causes failure
-4. Failures are explicit, attributable, and machine-readable
+- `scripts/`  
+  Signing and verification entry points.
 
-No routes are auto-approved.  
-No silent passes occur.
+- `src/`  
+  Admission logic and schemas.
 
----
-
-## Deterministic verification
-
-WFSL Admission Guard supports deterministic, non-destructive verification.
-
-Verification runs:
-
-- Declare execution context explicitly
-- Avoid reliance on platform introspection
-- Emit structured JSON evidence
-- Do not modify application or system state
-
-Typical artefacts include:
-
-- `environment.json`
-- `execution-context.json`
-- `run-*.json`
-
-These artefacts demonstrate observed behaviour only.
+- `.github/workflows/`  
+  Policy and integration workflows enforcing the Guard Pattern.
 
 ---
 
-## Intended use
+## Non-Goals
 
-WFSL Admission Guard is suitable for:
+This repository does not:
+- Act as a GitHub Action wrapper.
+- Expose mutable configuration.
+- Perform authorisation decisions.
+- Provide runtime network trust.
 
-- CI pipelines
-- Governance enforcement
-- Security review
-- Regulated environments
-- Teams requiring explicit surface control
-
-It is intentionally opinionated.
+These concerns may be layered later as separate components.
 
 ---
 
-## Licensing and reliance
+## Change Control
 
-This repository is available under the **WFSL Community Edition**.
+Any change that alters scope or guarantees must update `TRUST.md` and pass CI.
 
-Source code access, execution, and experimentation are permitted.
-
-**Production reliance, audit claims, or regulatory use are not permitted** without a Commercial Reliance Licence.
-
-Verification artefacts demonstrate observed behaviour only and do not grant permission to rely.
-
-See the canonical framework:
-
-- `WFSL-LICENSING-AND-RELIANCE.md`
-
-For commercial licensing enquiries:
-
-licensing@wfsl.uk
-
----
-
-## Status
-
-- Verification: complete
-- Deterministic evidence: emitted
-- CI enforcement: deterministic
-- Reliance granted: none
-
-This repository reflects a verified, non-reliant community release.
+Silent expansion of scope is not permitted.
