@@ -4,7 +4,7 @@
  * Deterministic behavioural tests.
  */
 
-import { evaluateAdmission, AdmissionPolicy } from './engine';
+import { evaluateAdmission, AdmissionPolicy } from './engine.ts';
 
 const policy: AdmissionPolicy = {
   version: 'v1',
