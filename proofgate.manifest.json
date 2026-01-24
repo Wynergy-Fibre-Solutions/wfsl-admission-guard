@@ -1,0 +1,19 @@
+{
+  "name": "wfsl-admission-guard",
+  "version": "0.1.0",
+  "description": "WFSL Admission Guard. Deterministically evaluates ProofGate bundles and emits admission verdicts.",
+  "owner": "Wynergy Fibre Solutions Ltd",
+  "scope": "admission",
+  "guardType": "admission",
+  "tier": "opencore",
+  "entrypoint": null,
+  "artefacts": [
+    "wfsl.admission.input.json",
+    "wfsl.admission.verdict.json"
+  ],
+  "determinism": {
+    "inputs": "proofgate-bundles",
+    "outputs": "deterministic-json",
+    "hash": "sha256"
+  }
+}
